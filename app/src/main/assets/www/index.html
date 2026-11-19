@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nihongo Taschenhelfer</title>
+<style>
+@font-face{font-family:"Atkinson";src:url(fonts/atkinson-hyperlegible-latin-400-normal.woff2) format("woff2");font-weight:400;unicode-range:U+0000-00FF,U+2000-206F,U+20AC}
+@font-face{font-family:"Atkinson";src:url(fonts/atkinson-hyperlegible-latin-700-normal.woff2) format("woff2");font-weight:700;unicode-range:U+0000-00FF,U+2000-206F,U+20AC}
+@font-face{font-family:"Atkinson";src:url(fonts/atkinson-hyperlegible-latin-ext-400-normal.woff2) format("woff2");font-weight:400;unicode-range:U+0100-024F}
+@font-face{font-family:"Atkinson";src:url(fonts/atkinson-hyperlegible-latin-ext-700-normal.woff2) format("woff2");font-weight:700;unicode-range:U+0100-024F}
+/* Layout: App-Shell – Kopf mit Suche und Kategorie-Chips, Kartenliste, feste Tab-Leiste unten; Zeigekarte als Vollbild */
+:root{
+  --bg:#eef1f6; --surface:#ffffff; --ink:#18213a; --muted:#5d6782;
+  --ai:#1f3a6e; --ai-soft:#dde5f3; --kihada:#e3b23c; --kihada-soft:#f7ecd0; --line:#d3d9e6; --halal:#2f7a5b;
+  --jp:"Noto Sans CJK JP","Noto Sans JP","Hiragino Sans",sans-serif;
+  --body:"Atkinson",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#0f1424; --surface:#1a2136; --ink:#e8ecf6; --muted:#9aa4bf;
+  --ai:#8fb0ec; --ai-soft:#24304f; --kihada:#e8bd55; --kihada-soft:#3a3120; --line:#2c3654; --halal:#6cc49d; color-scheme:dark}}
+*{-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--ink);margin:0}
+body{font-family:var(--body);font-size:16px;line-height:1.45;padding:0 16px 96px}
+[hidden]{display:none!important}
+.wrap{max-width:640px;margin:0 auto}
+header{position:sticky;top:0;background:var(--bg);z-index:5;padding:14px 0 8px}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+h1{font-family:var(--jp);font-weight:900;font-size:1.45rem;margin:0}
+h1 span{color:var(--ai)}
+.trip{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.search{margin-top:10px;width:100%;box-sizing:border-box;font:inherit;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;font:inherit;font-size:.9rem;padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ai);border-color:var(--ai);color:var(--bg);font-weight:700}
+.sec-title{font-family:var(--jp);font-weight:700;font-size:1.05rem;margin:18px 0 4px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.sec-title small{font-family:var(--body);font-weight:400;color:var(--muted);font-size:.85rem}
+.gintro{color:var(--muted);font-size:.88rem;margin:0 0 8px}
+.list{display:grid;gap:10px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 12px 10px 14px}
+.top{display:grid;grid-template-columns:1fr auto;gap:2px 10px}
+.de{font-weight:700;min-width:0}
+.ja{font-family:var(--jp);font-weight:700;font-size:1.35rem;line-height:1.35;color:var(--ai);grid-column:1/-1;word-break:break-word}
+.ro{color:var(--muted);font-size:.92rem;grid-column:1/-1}
+.note{font-size:.82rem;color:var(--muted);margin-top:6px}
+.acts{display:flex;gap:4px}
+.ib{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--ink);display:grid;place-items:center;padding:0}
+.ib svg{width:20px;height:20px}
+.ib.on{color:var(--kihada);border-color:var(--kihada)}
+.ib.playing{background:var(--ai);border-color:var(--ai);color:var(--bg)}
+.parts{margin-top:8px;border-top:1px dashed var(--line);padding-top:6px;display:grid;gap:2px}
+.plbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:2px 0}
+.prow{display:grid;grid-template-columns:auto 1fr auto;gap:0 10px;align-items:center;padding:6px 4px;border-radius:10px;border:0;background:none;color:inherit;font:inherit;text-align:left;width:100%}
+.prow:active{background:var(--ai-soft)}
+.prow .pj{font-family:var(--jp);font-weight:700;font-size:1.05rem;color:var(--ai)}
+.prow .pr{color:var(--muted);font-size:.85rem}
+.prow .pd{grid-column:2/3;font-size:.88rem}
+.prow .pmeta{display:grid;min-width:0}
+.prow svg{width:18px;height:18px;color:var(--muted)}
+.prow.kurz{background:var(--kihada-soft);margin-top:4px}
+.prow.playing svg{color:var(--ai)}
+.showcard{background:var(--surface);border:2px solid var(--ai);border-radius:16px;padding:16px;display:grid;gap:8px;text-align:left;font:inherit;color:var(--ink);width:100%}
+.showcard.halal{border-color:var(--halal)}
+.showcard b{font-family:var(--jp);font-size:1.1rem}
+.showcard .sj{font-family:var(--jp);color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.showcard .go{font-size:.85rem;font-weight:700;color:var(--ai)}
+.showcard.halal .go{color:var(--halal)}
+.tips{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.tips li{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.empty{color:var(--muted);padding:24px 4px;text-align:center}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);display:flex;justify-content:center;padding:0 6px}
+.tab{flex:1;max-width:140px;font:inherit;font-size:.74rem;background:none;border:0;color:var(--muted);padding:9px 2px 10px;display:grid;justify-items:center;gap:2px}
+.tab svg{width:22px;height:22px}
+.tab[aria-selected="true"]{color:var(--ai);font-weight:700}
+.overlay{position:fixed;inset:0;z-index:20;background:var(--surface);color:var(--ink);display:flex;flex-direction:column;padding:16px 20px}
+.overlay .otop{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.overlay .hint{font-size:.85rem;color:var(--muted)}
+.overlay .big{flex:1;display:flex;align-items:center;justify-content:center;overflow:auto;padding:16px 0}
+.overlay .big p{font-family:var(--jp);font-weight:700;margin:0;line-height:1.55;max-width:30ch}
+.overlay .sub{color:var(--muted);font-size:.95rem;border-top:1px solid var(--line);padding-top:10px}
+.btn{font:inherit;font-weight:700;padding:10px 16px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.btn.primary{background:var(--ai);border-color:var(--ai);color:var(--bg)}
+.flash{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px 18px;min-height:220px;display:grid;align-content:center;gap:14px;text-align:center}
+.flash .q{font-size:1.25rem;font-weight:700}
+.flash .fj{font-family:var(--jp);font-size:1.6rem;font-weight:700;color:var(--ai)}
+.flash .fr{color:var(--muted)}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.meta{color:var(--muted);font-size:.85rem;text-align:center;margin-top:8px;font-variant-numeric:tabular-nums}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 14px;border-radius:10px;font-size:.88rem;z-index:30;max-width:90vw}
+.drive{display:grid;gap:14px}
+.drive .info{font-size:.86rem;color:var(--muted);margin:0}
+.catgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.catbtn{font:inherit;font-weight:700;text-align:left;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:grid;gap:2px}
+.catbtn small{font-weight:400;color:var(--muted);font-variant-numeric:tabular-nums}
+.catbtn[aria-pressed="true"]{border:2px solid var(--ai);background:var(--ai-soft)}
+.now{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;display:grid;gap:6px;text-align:center}
+.now .nj{font-family:var(--jp);font-weight:700;font-size:1.7rem;color:var(--ai);line-height:1.35}
+.now .nd{font-weight:700;font-size:1.05rem}
+.now .pos{color:var(--muted);font-size:.85rem;font-variant-numeric:tabular-nums}
+.ctrl{display:grid;grid-template-columns:1fr 1.6fr 1fr;gap:10px}
+.cb{font:inherit;font-weight:700;border-radius:18px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-height:90px;display:grid;place-items:center;gap:2px}
+.cb svg{width:34px;height:34px}
+.cb.play{background:var(--ai);border-color:var(--ai);color:var(--bg);min-height:112px}
+.cb.play svg{width:48px;height:48px}
+.opts{display:flex;gap:8px;flex-wrap:wrap}
+.opt{font:inherit;font-size:.9rem;padding:9px 13px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.opt[aria-pressed="true"]{background:var(--ai);border-color:var(--ai);color:var(--bg);font-weight:700}
+.pbar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--kihada);width:0}
+select.sel{font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);width:100%}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><h1><span>日本語</span> Taschenhelfer</h1><div class="trip">offline</div></div>
+  <input id="q" class="search" type="search" placeholder="Suchen: Deutsch, Romaji oder Japanisch" aria-label="Suchen" autocomplete="off">
+  <div id="chips" class="chips"></div>
+</header>
+<main id="view"></main>
+</div>
+<nav class="tabs">
+  <button class="tab" data-tab="saetze" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16M4 10h16M4 15h10M4 20h7"/></svg>Sätze</button>
+  <button class="tab" data-tab="karten" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 10h10M7 14h6"/></svg>Zeigen</button>
+  <button class="tab" data-tab="auto" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>Hören</button>
+  <button class="tab" data-tab="ueben" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.5 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>Üben</button>
+  <button class="tab" data-tab="favs" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Merkliste</button>
+</nav>
+<audio id="kurs" preload="none"></audio>
+<script src="data.js"></script>
+<script>
+const G=DATA.groups, SHOW=DATA.show, TIPS=DATA.tips;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const NATIVE=window.Android||null;
+let favs=new Set(store.get("jp2-favs",[])), tab="saetze", cat=store.get("jp2-cat","alle"), query="";
+// Eintrags-Register: jeder Satz, Baustein und jede Kurzform ist ein Eintrag mit eigener Nummer
+const ENT=[]; const reg=(o,g,kind)=>{o.n=ENT.length;o.g=g;o.kind=kind;ENT.push(o);return o;};
+G.forEach(g=>g.items.forEach(it=>{reg(it,g.id,"main");it.parts.forEach(p=>reg(p,g.id,"part"));if(it.kurz)reg(it.kurz,g.id,"kurz");}));
+
+// ---------- Ton ----------
+const player=new Audio(); let playingN=null;
+function play(text,n){
+  const k=$("#kurs"); if(k&&!k.paused) k.pause();
+  const src=AUDIO[text]; if(!src) return;
+  player.pause(); player.src=src; player.currentTime=0;
+  playingN=n; mark(); player.play().catch(()=>{});
+}
+player.addEventListener("ended",()=>{playingN=null;mark();});
+function mark(){ document.querySelectorAll("[data-n]").forEach(el=>el.classList.toggle("playing",+el.dataset.n===playingN&&el.dataset.act==="speak")); }
+let tt; function toast(m){let el=$(".toast");if(!el){el=document.createElement("div");el.className="toast";document.body.appendChild(el);}el.textContent=m;el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>el.hidden=true,2600);}
+
+const I={
+ spk:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>',
+ big:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+ fav:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>',
+ favOn:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>'
+};
+function prow(p,cls){ return `<button class="prow ${cls||""}" data-act="speak" data-n="${p.n}"><span class="pmeta"><span class="pj" lang="ja">${esc(p.ja)}</span>${p.ro?`<span class="pr">${esc(p.ro)}</span>`:""}</span><span class="pd">${esc(p.de)}</span>${I.spk}</button>`; }
+function card(it){
+  const on=favs.has(it.ja);
+  return `<article class="card"><div class="top">
+    <div class="de">${esc(it.de)}</div>
+    <div class="acts"><button class="ib" data-act="speak" data-n="${it.n}" aria-label="Anhören">${I.spk}</button><button class="ib" data-act="big" data-n="${it.n}" aria-label="Groß zeigen">${I.big}</button><button class="ib ${on?"on":""}" data-act="fav" data-n="${it.n}" aria-label="Merken">${on?I.favOn:I.fav}</button></div>
+    <div class="ja" lang="ja">${esc(it.ja)}</div>${it.ro?`<div class="ro">${esc(it.ro)}</div>`:""}</div>
+    ${it.note?`<div class="note">${esc(it.note)}</div>`:""}
+    ${it.parts&&it.parts.length?`<div class="parts"><div class="plbl">Bausteine</div>${it.parts.map(p=>prow(p)).join("")}</div>`:""}
+    ${it.kurz?`<div class="parts" style="border:0;padding-top:0"><div class="plbl">Kürzer gesagt</div>${prow(it.kurz,"kurz")}</div>`:""}
+  </article>`;
+}
+const norm=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+function hit(it,q,raw){ const f=x=>x&&(norm(x.de).includes(q)||norm(x.ro).includes(q)||x.ja.includes(raw)); return f(it)||(it.parts||[]).some(f)||f(it.kurz); }
+function renderChips(){
+  $("#chips").hidden=tab!=="saetze"; $("#q").hidden=!(tab==="saetze"||tab==="favs");
+  if(tab!=="saetze") return;
+  const all=[["alle","Alle"]].concat(G.map(g=>[g.id,g.t]),[["tipps","Kultur-Tipps"]]);
+  $("#chips").innerHTML=all.map(([id,n])=>`<button class="chip" data-cat="${id}" aria-pressed="${cat===id}">${esc(n)}</button>`).join("");
+}
+function renderSaetze(onlyFav){
+  const raw=query.trim(), q=norm(raw); let h="";
+  const groups=(cat==="alle"||q||onlyFav)?G:G.filter(g=>g.id===cat);
+  if(!onlyFav && cat==="tipps" && !q) return `<h2 class="sec-title">Kultur-Tipps</h2><ul class="tips">${TIPS.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`;
+  for(const g of groups){
+    let items=g.items.filter(it=>!q||hit(it,q,raw));
+    if(onlyFav) items=items.filter(it=>favs.has(it.ja));
+    if(!items.length) continue;
+    h+=`<h2 class="sec-title">${esc(g.t)}</h2>${g.i&&!onlyFav?`<p class="gintro">${esc(g.i)}</p>`:""}`;
+    if(g.id==="halal"&&!q&&!onlyFav) h+=`<div class="list" style="margin-bottom:10px">${showBtn(SHOW[0])}</div>`;
+    h+=`<div class="list">${items.map(card).join("")}</div>`;
+  }
+  if(!onlyFav && cat==="alle" && !q) h+=`<h2 class="sec-title">Kultur-Tipps</h2><ul class="tips">${TIPS.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`;
+  return h||`<p class="empty">${onlyFav?"Noch nichts gemerkt. Tippe bei einem Satz auf das Lesezeichen.":"Nichts gefunden."}</p>`;
+}
+function showBtn(s){ return `<button class="showcard ${s.cls}" data-show="${s.id}"><b>${esc(s.t)}</b><span>${esc(s.de)}</span><span class="sj" lang="ja">${esc(s.ja)}</span><span class="go">Groß zeigen ›</span></button>`; }
+
+// ---------- Üben ----------
+let deck=[],di=0,revealed=false,known=0,uCat=store.get("jp2-ucat","alle");
+function newDeck(){
+  let pool=ENT.filter(e=>e.ro&&!/[〜…]/.test(e.ja));
+  if(uCat==="favs") pool=pool.filter(e=>favs.has(e.ja)||ENT.some(m=>m.kind==="main"&&favs.has(m.ja)&&(m.parts.includes(e)||m.kurz===e)));
+  else if(uCat!=="alle") pool=pool.filter(e=>e.g===uCat);
+  const seen=new Set(); pool=pool.filter(e=>!seen.has(e.ja)&&seen.add(e.ja));
+  deck=pool.map(p=>[Math.random(),p]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]).slice(0,20); di=0;revealed=false;known=0;
+}
+function renderUeben(){
+  const sel=`<select class="sel" id="ucat"><option value="alle">Alle Bereiche</option><option value="favs">Meine Merkliste</option>${G.map(g=>`<option value="${g.id}">${esc(g.t)}</option>`).join("")}</select>`;
+  let body;
+  if(!deck.length) body=`<p class="empty">Hier gibt es noch nichts zu üben.</p>`;
+  else if(di>=deck.length) body=`<div class="flash"><div class="q">${known} von ${deck.length} gewusst</div><div class="row"><button class="btn primary" data-act="newdeck">Neue Runde</button></div></div>`;
+  else { const p=deck[di];
+    body=`<div class="flash"><div class="q">${esc(p.de)}</div>${revealed?`<div><div class="fj" lang="ja">${esc(p.ja)}</div><div class="fr">${esc(p.ro)}</div></div>`:`<div class="meta">Sag es laut, dann aufdecken.</div>`}</div>
+    <div class="row">${revealed?`<button class="btn" data-act="speakcur">Anhören</button><button class="btn" data-act="next0">Noch üben</button><button class="btn primary" data-act="next1">Gewusst</button>`:`<button class="btn primary" data-act="reveal">Aufdecken</button>`}</div><p class="meta">Karte ${di+1} / ${deck.length}</p>`; }
+  setTimeout(()=>{const s=$("#ucat"); if(s) s.value=uCat;},0);
+  return `<h2 class="sec-title">Üben</h2><div style="margin-bottom:12px">${sel}</div>${body}`;
+}
+
+// ---------- Hörmodus ----------
+const kurs=$("#kurs"); const KORDER=G.map(g=>g.id).filter(id=>KURS[id]);
+const K={cat:store.get("jp2-kcat",KORDER[0]),idx:0,all:store.get("jp2-kall",true),loop:store.get("jp2-kloop",true)};
+if(!KURS[K.cat]) K.cat=KORDER[0];
+const gOf=id=>G.find(g=>g.id===id);
+function keepOn(v){ try{ NATIVE&&NATIVE.keepScreenOn(!!v); }catch(e){} }
+function startCat(id,idx,doPlay){
+  K.cat=id; store.set("jp2-kcat",id); K.idx=idx||0;
+  const src=KURS[id].f; if(!kurs.src.endsWith(src)){ kurs.src=src; kurs.load(); }
+  const go=()=>{ kurs.currentTime=K.idx?KURS[id].cues[K.idx]:0; if(doPlay) kurs.play().catch(()=>{}); };
+  if(kurs.readyState>=1) go(); else kurs.addEventListener("loadedmetadata",go,{once:true});
+  render();
+}
+function togglePlay(){ player.pause(); if(!kurs.src) return startCat(K.cat,K.idx,true); kurs.paused?kurs.play().catch(()=>{}):kurs.pause(); }
+function step(d){
+  const cues=KURS[K.cat].cues; let i=K.idx+d;
+  if(d<0&&kurs.currentTime-cues[K.idx]>3) i=K.idx;
+  if(i<0) i=0; if(i>=cues.length) return nextCat();
+  K.idx=i; if(!kurs.src) return startCat(K.cat,i,true);
+  kurs.currentTime=cues[i]; if(kurs.paused) kurs.play().catch(()=>{}); updateNow();
+}
+function nextCat(){ let n=KORDER.indexOf(K.cat)+1; if(n>=KORDER.length){ if(!K.loop){kurs.pause();return;} n=0; } startCat(KORDER[n],0,true); }
+kurs.addEventListener("ended",()=>{ if(K.all) nextCat(); else if(K.loop) startCat(K.cat,0,true); else keepOn(false); });
+kurs.addEventListener("timeupdate",()=>{ const c=KURS[K.cat].cues,t=kurs.currentTime; let i=0; for(let j=0;j<c.length;j++) if(t>=c[j]-0.05) i=j; K.idx=i; updateNow(); });
+kurs.addEventListener("play",()=>{keepOn(true);updateNow();});
+kurs.addEventListener("pause",()=>{keepOn(false);updateNow();});
+const KI={play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12.5-7.5z"/></svg>',pause:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4.2" height="15" rx="1"/><rect x="13.8" y="4.5" width="4.2" height="15" rx="1"/></svg>',prev:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="4.5" y="5" width="2.6" height="14" rx="1"/><path d="M19.5 5v14L8.5 12z"/></svg>',next:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="16.9" y="5" width="2.6" height="14" rx="1"/><path d="M4.5 5v14l11-7z"/></svg>'};
+function updateNow(){
+  if(tab!=="auto") return; const g=gOf(K.cat), it=g.items[K.idx]||g.items[0];
+  const el=$("#know"); if(el){ el.querySelector(".nd").textContent=it.de; el.querySelector(".nj").textContent=it.ja; el.querySelector(".pos").textContent=g.t+" · "+(K.idx+1)+" von "+g.items.length; }
+  const pb=$("#kplay"); if(pb) pb.innerHTML=(kurs.paused?KI.play+"Abspielen":KI.pause+"Pause");
+  const bar=$("#kbar"); if(bar&&kurs.duration) bar.style.width=(kurs.currentTime/kurs.duration*100)+"%";
+}
+function renderAuto(){
+  const g=gOf(K.cat), it=g.items[K.idx]||g.items[0]; setTimeout(updateNow,0);
+  return `<div class="drive"><h2 class="sec-title" style="margin-bottom:0">Hören <small>zum Lernen beim Autofahren</small></h2>
+  <p class="info">Erst der Satz auf Deutsch, dann eine Denkpause. Danach jeder Baustein auf Deutsch und Japanisch, zum Schluss der ganze Satz zweimal und die Kurzform. Einmal starten, dann läuft alles von allein. Der Bildschirm bleibt dabei an.</p>
+  <div class="now" id="know"><div class="pos"></div><div class="nd">${esc(it.de)}</div><div class="nj" lang="ja">${esc(it.ja)}</div><div class="pbar"><i id="kbar"></i></div></div>
+  <div class="ctrl"><button class="cb" data-k="prev" aria-label="Zurück">${KI.prev}</button><button class="cb play" id="kplay" data-k="play">${KI.play}Abspielen</button><button class="cb" data-k="next" aria-label="Weiter">${KI.next}</button></div>
+  <div class="opts"><button class="opt" data-k="all" aria-pressed="${K.all}">Danach nächster Bereich</button><button class="opt" data-k="loop" aria-pressed="${K.loop}">Endlos wiederholen</button></div>
+  <div class="catgrid">${KORDER.map(id=>`<button class="catbtn" data-kcat="${id}" aria-pressed="${id===K.cat}">${esc(gOf(id).t)}<small>${KURS[id].n} Einträge · ca. ${KURS[id].min} Min.</small></button>`).join("")}</div></div>`;
+}
+
+// ---------- Ansicht ----------
+function render(){
+  renderChips(); let h="";
+  if(tab==="saetze") h=renderSaetze(false);
+  else if(tab==="favs") h=`<h2 class="sec-title">Merkliste</h2>`+renderSaetze(true);
+  else if(tab==="karten") h=`<h2 class="sec-title">Zeigekarten <small>Handy hinhalten</small></h2><div class="list">${SHOW.map(showBtn).join("")}</div>`;
+  else if(tab==="auto") h=renderAuto();
+  else h=renderUeben();
+  $("#view").innerHTML=h; mark();
+  document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab));
+}
+let overlay=null;
+function openBig(ja,de,ro){
+  const L=ja.length, size=L<8?"clamp(3rem,16vw,6rem)":L<20?"clamp(2rem,10vw,3.6rem)":L<60?"clamp(1.6rem,7vw,2.6rem)":"clamp(1.25rem,5.4vw,1.9rem)";
+  overlay=document.createElement("div"); overlay.className="overlay";
+  overlay.innerHTML=`<div class="otop"><span class="hint">Zum Zeigen</span><div style="display:flex;gap:8px"><button class="btn" data-o="spk">Anhören</button><button class="btn primary" data-o="close">Schließen</button></div></div><div class="big"><p lang="ja" style="font-size:${size}">${esc(ja)}</p></div><div class="sub">${esc(de)}${ro?" · "+esc(ro):""}</div>`;
+  overlay.addEventListener("click",e=>{const a=e.target.closest("[data-o]")?.dataset.o; if(a==="close")closeBig(); if(a==="spk")play(ja,-1);});
+  document.body.appendChild(overlay); keepOn(true);
+}
+function closeBig(){ if(overlay){overlay.remove();overlay=null; if(kurs.paused) keepOn(false);} }
+window.__back=()=>{ if(overlay){closeBig();return true;} if(tab!=="saetze"){tab="saetze";render();return true;} return false; };
+
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button"); if(!t||t.closest(".overlay")) return;
+  if(t.dataset.tab){ tab=t.dataset.tab; if(tab==="ueben"&&!deck.length) newDeck(); render(); window.scrollTo(0,0); return; }
+  if(t.dataset.cat){ cat=t.dataset.cat; store.set("jp2-cat",cat); render(); window.scrollTo(0,0); return; }
+  if(t.dataset.show){ const s=SHOW.find(x=>x.id===t.dataset.show); openBig(s.ja,s.de,""); return; }
+  if(t.dataset.kcat){ startCat(t.dataset.kcat,0,true); return; }
+  if(t.dataset.k){ const k=t.dataset.k; if(k==="play")togglePlay(); if(k==="next")step(1); if(k==="prev")step(-1);
+    if(k==="all"){K.all=!K.all;store.set("jp2-kall",K.all);render();} if(k==="loop"){K.loop=!K.loop;store.set("jp2-kloop",K.loop);render();} return; }
+  const a=t.dataset.act, en=t.dataset.n!==undefined?ENT[+t.dataset.n]:null;
+  if(a==="speak"&&en) play(en.ja,en.n);
+  if(a==="big"&&en) openBig(en.ja,en.de,en.ro);
+  if(a==="fav"&&en){ favs.has(en.ja)?favs.delete(en.ja):favs.add(en.ja); store.set("jp2-favs",[...favs]); render(); toast(favs.has(en.ja)?"Gemerkt":"Von der Merkliste entfernt"); }
+  if(a==="reveal"){revealed=true;render();}
+  if(a==="speakcur") play(deck[di].ja,-1);
+  if(a==="next0"||a==="next1"){ if(a==="next1")known++; di++; revealed=false; render(); }
+  if(a==="newdeck"){ newDeck(); render(); }
+});
+document.addEventListener("change",e=>{ if(e.target.id==="ucat"){ uCat=e.target.value; store.set("jp2-ucat",uCat); newDeck(); render(); } });
+$("#q").addEventListener("input",e=>{ query=e.target.value; render(); $("#q").focus(); });
+render();
+</script>
+</body>
+</html>
